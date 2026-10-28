@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Provision pinned Godot on Linux x86_64, validate, launch smoke test, export Web."""
-import hashlib, json, os, platform, shutil, subprocess, urllib.request, zipfile
+import hashlib, json, os, platform, shutil, subprocess, urllib.request, zipfile, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,12 +50,14 @@ def run(*args):
         raise SystemExit('Godot check/export failed: ' + ' '.join(args))
     return output
 
+subprocess.run([sys.executable, str(ROOT / 'scripts/prepare_assets.py')], check=True)
 run('--editor', '--import')
-run('--check-only', '--script', 'main.gd')
-run('--check-only', '--script', 'scripts/verify_input.gd')
+for script in sorted(ROOT.rglob('*.gd')):
+    if '.godot' not in script.parts and '.toolchain' not in script.parts:
+        run('--check-only', '--script', str(script))
 run('--script', 'scripts/verify_input.gd')
 boot = run('--quit-after', '10')
-if 'STAGE_A_READY' not in boot:
+if 'STAGE_B1_READY' not in boot:
     raise SystemExit('Main scene did not report readiness')
 (ROOT / 'dist').mkdir(exist_ok=True)
 run('--export-release', 'Web', str(ROOT / 'dist/index.html'))

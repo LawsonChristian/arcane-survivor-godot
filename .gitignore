@@ -5,3 +5,4 @@ dist/
 *.zip
 *.tpz
 __pycache__/
+assets/generated/
