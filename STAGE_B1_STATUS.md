@@ -37,7 +37,13 @@ Real keyboard input and B.1 physical iPhone controls have not been confirmed her
 
 ## Deployment
 
-Pending this implementation's GitHub Pages workflow run. Preview remains https://lawsonchristian.github.io/arcane-survivor-godot/ . Results will be recorded after publication.
+**Succeeded.** Preview: https://lawsonchristian.github.io/arcane-survivor-godot/
+
+Run: https://github.com/LawsonChristian/arcane-survivor-godot/actions/runs/40645151965
+
+Deployed source: `16af556f23ed54b6d7966c2642aabb904e58715f`. Build job `122672142280` and deploy job `122672311608` both succeeded. All deployed manifest file checksums/sizes passed. PCK: 11,994,000 bytes. WASM: 39,514,754 bytes, `application/wasm`. Existing workflow blob is unchanged (`6c882ce3647af36c0fb28d57027f2e002b18b685`).
+
+The exported PCK also launched with the pinned Linux engine in headless mode and emitted `STAGE_B1_READY` without errors. The live HTTPS page was opened in cloud Chrome; it still reports missing WebGL2, so actual B.1 GPU screenshots and keyboard operation cannot be verified here. No physical B.1 iPhone test is claimed. Please refresh Safari, confirm B.1 in the HUD, explore the paths, check wall sliding and touch release, and report the sprite scale/animation/appearance. The source-only original-asset blob hashes were independently checked against local original bytes.
 
 ## Stop boundary
 

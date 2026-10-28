@@ -1,23 +1,19 @@
-# Arcane Survivor — Godot Stage A
+# Arcane Survivor — Godot preview
 
-Separate Godot 4.7.2 technical proof of concept: a background, movable placeholder, keyboard/touch controls, FPS counter and engine-version label. No existing game artwork, spells, enemies, progression, cosmetics or save data are included.
+Current milestone: **B.1**, original forest layout plus one temporary layered Mage reference. This is not final character-art approval or the final customization architecture. No combat or progression.
 
-## Build
+Preview: https://lawsonchristian.github.io/arcane-survivor-godot/
 
-Run `python3 scripts/build.py` on Linux x86_64 with Python 3 and network access. It downloads the official pinned Godot 4.7.2 engine and matching export templates when missing, imports scenes, validates GDScript, checks scene startup and simulated touch input, then exports a single-threaded Compatibility build into ignored `dist/`. Set `GODOT_BIN` to an installed 4.7.2 executable to reuse it. The script checks required files and emits `dist/build-manifest.json` with SHA-256 hashes. The provisioning cache is ignored.
+See [STAGE_B1_STATUS.md](STAGE_B1_STATUS.md) for implementation, tests, visual differences and device-testing limits. Stage A.2 was confirmed by the owner on iPhone Safari; B.1 still requires device feedback.
 
-## Pages workflow
+## Reproduce
 
-`.github/workflows/pages.yml` builds on an explicit Actions → Godot 4.7.2 web preview → Run workflow request. It uses official GitHub Pages artifact/deployment actions. Generated HTML/JS/WASM/PCK stay in the artifact, never in source control. No Git LFS. The deploy job uses the built-in short-lived Actions token with `pages: write` and `id-token: write`; no personal token is required.
+Run `python3 scripts/build.py` on Linux x86_64 with Python 3/network access, or set `GODOT_BIN` to an existing Godot 4.7.2 executable. The build provisions matching templates, regenerates the static map from untouched originals, imports/validates all scripts, tests the scene and exports a single-threaded Compatibility build. Generated exports/cache/map texture are excluded from Git. Original assets and SHA-256 manifest are retained in `assets/original/`.
 
-This test repository is public with the owner's approval. GitHub Pages uses GitHub Actions as its publishing source. Publishing is manually triggered for each approved test build; automatic-on-push deployment is not enabled. Future updates can still be made and published by ChatGPT Work without the owner editing code.
+Publish through Actions → Godot 4.7.2 web preview → Run workflow on main. The existing manually triggered Pages workflow is unchanged; no personal token or Git LFS is needed. Work can edit code and publish updates conversationally.
 
-The HTTP check verifies deployed asset sizes/hashes and `application/wasm`; it cannot establish browser initialization or input. GitHub Pages uses HTTPS and standard MIME mappings. Actual delivery must be checked after publication. No custom cross-origin isolation headers are assumed; the export is single-threaded and requires WebAssembly/WebGL2.
+## Phone test
 
-## iPhone test
+Refresh the preview in Safari. Look for B.1 in the HUD, then drag below the header to explore the pathways. Lift to stop. Check walls, sprite animation, scale and rotating the device. Keyboard controls use WASD/arrows. Cloud Chrome currently lacks WebGL2, so screenshots of actual game rendering and keyboard input have not been verified here.
 
-Open https://lawsonchristian.github.io/arcane-survivor-godot/ in Safari and wait for the initial engine download. Confirm the cyan diamond, Godot 4.7.2 label and FPS display. Touch below the header and drag to move; lift to stop. Try edges, portrait/landscape and switching away/back. Report blank screens, errors, scrolling, stuck input or clipped text. Keyboard testing uses WASD/arrows with canvas focus. Physical iPhone touch/Safari remain unverified.
-
-Stage B is not authorized. The existing browser game and its hosting are separate and unchanged.
-
-See [STAGE_A2_STATUS.md](STAGE_A2_STATUS.md) for actual deployment results and the cloud-browser WebGL2 limitation.
+Original browser prototype/artwork/save data are unchanged. Stage B.2 is not authorized.
