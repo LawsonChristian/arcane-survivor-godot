@@ -1,0 +1,74 @@
+name: Godot 4.7.2 web preview
+
+# Manual-only pending approval of visibility / Pages availability.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: godot-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      pages: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+      - name: Reject tracked export binaries
+        shell: bash
+        run: |
+          if git ls-files | grep -E '(^dist/|\.(wasm|pck|tpz)$)'; then
+            echo "::error::Generated exports must not be tracked in Git."
+            exit 1
+          fi
+      - name: Install Godot, validate, smoke-test and export
+        run: python3 scripts/build.py
+      - name: Confirm single-threaded Compatibility settings
+        run: |
+          grep -F 'renderer/rendering_method="gl_compatibility"' project.godot
+          grep -F 'const GODOT_THREADS_ENABLED = false;' dist/index.html
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload generated Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+      - name: Report build failure
+        if: failure()
+        run: |
+          echo "::error::Godot validation, export or Pages artifact preparation failed. Inspect this job's failed step."
+          echo 'Build failed; no new Pages deployment was made.' >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish GitHub Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Check out verification script
+        uses: actions/checkout@v6
+      - name: Verify deployed files, MIME and checksums
+        env:
+          PREVIEW_URL: ${{ steps.deployment.outputs.page_url }}
+        run: python3 scripts/verify_http.py
+      - name: Report deployment or HTTP verification failure
+        if: failure()
+        run: |
+          echo "::error::Pages deployment or HTTP checks failed. Inspect logs; do not switch providers silently."
+          echo 'Deployment/verification failed; check whether publication occurred before the failure.' >> "$GITHUB_STEP_SUMMARY"
